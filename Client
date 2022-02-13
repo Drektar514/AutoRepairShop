@@ -1,0 +1,48 @@
+using System;
+
+namespace AutoRepairShop
+{
+    class Client
+    {
+        private Random _random;
+        private DetailCreator _detailCreator;
+        private int _money;
+        private int _moneyToPay;
+
+        public string BrokenDetail { get; private set; }
+
+        public Client()
+        {
+            _random = new Random();
+            _detailCreator = new DetailCreator();
+            _money = _random.Next(1000, 5000);
+            BrokenDetail = _detailCreator.GetRandomName(_random.Next(0, _detailCreator.NamesCount));
+        }
+
+        public bool CheckSolvency(int pricePay)
+        {
+            _moneyToPay = pricePay;
+
+            if (_money >= _moneyToPay)
+            {
+                return true;
+            }
+
+            else
+            {
+                _moneyToPay = 0;
+                return false;
+            }
+        }
+
+        public void Pay(int sumRepair)
+        {
+            _money -= sumRepair;
+        }
+
+        public void GetMoneyForDamage(int money)
+        {
+            _money += money;
+        }
+    }
+}
