@@ -1,0 +1,24 @@
+using System;
+using System.Collections.Generic;
+
+namespace AutoRepairShop
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            int userNumber;
+            bool isNumber;
+            AutoRepair autoRepair = new AutoRepair();
+            Console.WriteLine("Добро пожаловать в Автосервис, выберите количество человек в очереди на обслуживание - ");
+            isNumber = Int32.TryParse(Console.ReadLine(), out userNumber);
+            autoRepair.AddClients(userNumber);
+            while (autoRepair.СlientsCount > 0)
+            {
+                autoRepair.ServeClient();
+            }
+            Console.WriteLine("На сегодня мы закончили работу");
+            Console.ReadKey();
+        }
+    }
+ }
