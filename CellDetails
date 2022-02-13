@@ -1,0 +1,23 @@
+using System;
+
+namespace AutoRepairShop
+{
+    class CellDetails
+    {
+        public Detail Detail { get; private set; }
+        public int Count { get; private set; }
+
+        public CellDetails() { }
+
+        public CellDetails(string detailName, int detailPrice, int count)
+        {
+            Detail = new Detail(detailName, detailPrice);
+            Count = count;
+        }
+
+        public void RemoveDetail()
+        {
+            Count--;
+        }
+    }
+}
