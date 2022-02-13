@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+
+namespace AutoRepairShop
+{
+    class Warehouse
+    {
+        private List<CellDetails> _details;
+        private DetailCreator _detailCreator;
+        private Dictionary<string, CellDetails> _cellDetails;
+
+        public Warehouse()
+        {
+            _details = new List<CellDetails>();
+            _detailCreator = new DetailCreator();
+            _cellDetails = new Dictionary<string, CellDetails>();
+            CreateDetails();
+            FillDetailDictionary();
+        }
+
+        public void CreateDetails()
+        {
+            _details.AddRange(_detailCreator.Create());
+        }
+
+        public void FillDetailDictionary()
+        {
+            foreach (var detail in _details)
+            {
+                _cellDetails.Add(detail.Detail.Name, detail);
+            }
+        }
+
+        public int GetPriceDetail(string detailName)
+        {
+            int priceDetail = 0;
+
+            foreach (var details in _details)
+            {
+                if (details.Detail.Name.Equals(detailName))
+                {
+                    priceDetail = details.Detail.Price;
+                }
+            }
+
+            return priceDetail;
+        }
+
+        public void RemoveDetail(Detail currentDetail)
+        {
+            if (_cellDetails.ContainsKey(currentDetail.Name))
+            {
+                _cellDetails[currentDetail.Name].RemoveDetail();
+            }
+        }
+
+
+        public CellDetails GetDetailToId(int detailId)
+        {
+            int currentId = 0;
+
+            foreach (var detail in _details)
+            {
+                currentId++;
+
+                if (currentId == detailId)
+                {
+                    return detail;
+                }
+            }
+
+            return null;
+        }
+
+        public bool CheckAvailabilityDetail(CellDetails detail)
+        {
+            return detail.Count > 0;
+        }
+
+        public void ShowDetails()
+        {
+            int id = 1;
+
+            foreach (var detail in _details)
+            {
+                Console.WriteLine($"{id} Деталь - {detail.Detail.Name}, стоимость - {detail.Detail.Price}, количество на складе - {detail.Count} штук.");
+                id++;
+            }
+        }
+    }
+}
