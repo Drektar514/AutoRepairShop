@@ -1,0 +1,39 @@
+using System;
+using System.Collections.Generic;
+
+namespace AutoRepairShop
+{
+    class DetailCreator
+    {
+        private string[] _names = { "Колёса", "Тормоза", "Двигатель", "Стеклоподъёмники", "Стереосистема", "Глушитель", "Коробка передач" };
+        private Random _random;
+
+        public int NamesCount => _names.Length;
+
+        public DetailCreator()
+        {
+            _random = new Random();
+        }
+
+        public List<CellDetails> Create()
+        {
+            List<CellDetails> _details = new List<CellDetails>();
+            int _price;
+            int _count;
+
+            for (int i = 0; i < _names.Length; i++)
+            {
+                _count = _random.Next(3, 10);
+                _price = _random.Next(200, 500);
+                _details.Add(new CellDetails(_names[i], _price, _count));
+            }
+
+            return _details;
+        }
+
+        public string GetRandomName(int index)
+        {
+            return _names[index];
+        }
+    }
+}
