@@ -1,0 +1,155 @@
+using System;
+using System.Collections.Generic;
+
+namespace AutoRepairShop
+{
+    class AutoRepair
+    {
+        private Warehouse _warehouse;
+        private Queue<Client> _clients;
+        private Client _currentClient;
+        private CellDetails _currentCellDetail;
+        private int _balanceMoney;
+        private int _damageMoney;
+        private int _forfeit;
+        private int _priceRepairWork;
+
+        public int СlientsCount => _clients.Count;
+
+        public AutoRepair()
+        {
+            _warehouse = new Warehouse();
+            _clients = new Queue<Client>();
+            _balanceMoney = 0;
+            _damageMoney = 500;
+            _forfeit = 350;
+            _priceRepairWork = 500;
+        }
+
+        public void ServeClient()
+        {
+
+            ShowBalance();
+            SelectCurentClient();
+
+            int sumRepair = CalculateAmountRepair(_currentClient.BrokenDetail);
+            Console.WriteLine($"У данного клиента сломано - {_currentClient.BrokenDetail}, стоимость починки - {sumRepair}");
+
+            ShowWarehouseInfo();
+
+            Console.WriteLine("Выберите деталь для ремонта - ");
+            _currentCellDetail = SelectDetailToReplace();
+
+            if (!_warehouse.CheckAvailabilityDetail(_currentCellDetail))
+            {
+                Console.WriteLine("К сожалению, данные детали закончились на складе, Мы не можем починить ваш автомобиль, придётся заплатить штраф");
+                PayForfeit();
+            }
+
+            else if (_currentClient.BrokenDetail.Equals(_currentCellDetail.Detail.Name))
+            {
+                Console.WriteLine("Всё отлично, сейчас приступим к ремонту");
+                bool toPay = _currentClient.CheckSolvency(sumRepair);
+
+                if (toPay)
+                {
+                    RemoveDetail(_currentCellDetail.Detail);
+                    _currentClient.Pay(sumRepair);
+                    CalculateClient(sumRepair);
+                }
+
+                else
+                {
+                    Console.WriteLine("У клиента не хватило денег на ремонт, он уехал");
+                }
+            }
+
+            else
+            {
+                RemoveDetail(_currentCellDetail.Detail);
+                Console.WriteLine("Упс, мы заменили не ту деталь, прошу нас простить, мы выплатим вам ущерб");
+                _currentClient.GetMoneyForDamage(PayForDamage());
+            }
+
+            RemoveClientFromQueue();
+            Console.ReadKey();
+            Console.Clear();
+        }
+
+        public void AddClients(int queueLenght)
+        {
+            for (int i = 0; i < queueLenght; i++)
+            {
+                _clients.Enqueue(new Client());
+            }
+        }
+
+        private void ShowWarehouseInfo()
+        {
+            _warehouse.ShowDetails();
+        }
+
+        private void ShowBalance()
+        {
+            Console.WriteLine($"Баланс нашего автосервиса - {_balanceMoney}");
+        }
+
+        private void CalculateClient(int money)
+        {
+            _balanceMoney += money;
+        }
+
+        private int CalculateAmountRepair(string detailName)
+        {
+            int _repairSum = 0;
+            _repairSum = _warehouse.GetPriceDetail(detailName) + _priceRepairWork;
+            return _repairSum;
+
+        }
+
+        private CellDetails SelectDetailToReplace()
+        {
+            int detailId;
+            bool isNumber;
+            isNumber = Int32.TryParse(Console.ReadLine(), out detailId);
+
+            if (isNumber)
+            {
+                return _warehouse.GetDetailToId(detailId);
+            }
+
+            else
+            {
+                return null;
+            }
+        }
+
+        private void RemoveDetail(Detail detail)
+        {
+            _warehouse.RemoveDetail(detail);
+        }
+
+        private void PayForfeit()
+        {
+            _balanceMoney -= _forfeit;
+        }
+
+        private int PayForDamage()
+        {
+            _balanceMoney -= _damageMoney;
+            return _damageMoney;
+        }
+
+        private void RemoveClientFromQueue()
+        {
+            _clients.Dequeue();
+            Console.WriteLine($"На сегодня осталось - {СlientsCount} клиентов.");
+        }
+
+        private void SelectCurentClient()
+        {
+            _currentClient = _clients.Peek();
+        }
+
+    }
+}
